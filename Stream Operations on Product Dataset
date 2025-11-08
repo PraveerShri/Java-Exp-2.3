@@ -1,0 +1,58 @@
+import java.util.*;
+import java.util.stream.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
+
+class Product {
+    String name;
+    double price;
+    String category;
+
+    Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%-10s | %-10s | %.2f", name, category, price);
+    }
+}
+
+public class ProductStreamOperations {
+    public static void main(String[] args) {
+        List<Product> products = Arrays.asList(
+            new Product("Laptop", 85000, "Electronics"),
+            new Product("Phone", 60000, "Electronics"),
+            new Product("Shirt", 1500, "Clothing"),
+            new Product("Jeans", 2500, "Clothing"),
+            new Product("Milk", 60, "Groceries"),
+            new Product("Cheese", 200, "Groceries")
+        );
+
+        // Group by category
+        System.out.println("\n📦 Products Grouped by Category:");
+        Map<String, List<Product>> grouped = products.stream()
+                .collect(Collectors.groupingBy(p -> p.category));
+        grouped.forEach((cat, list) -> {
+            System.out.println(cat + ": " + list);
+        });
+
+        // Most expensive product in each category
+        System.out.println("\n💰 Most Expensive Product in Each Category:");
+        Map<String, Optional<Product>> expensive = products.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.category,
+                        Collectors.maxBy(Comparator.comparingDouble(p -> p.price))
+                ));
+        expensive.forEach((cat, prod) -> 
+            System.out.println(cat + ": " + prod.get().name + " - " + prod.get().price));
+
+        // Average price of all products
+        double avgPrice = products.stream()
+                .collect(Collectors.averagingDouble(p -> p.price));
+        System.out.println("\n📊 Average Price of All Products: " + avgPrice);
+    }
+}
